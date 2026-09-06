@@ -1,0 +1,390 @@
+openapi: 3.0.3
+
+info:
+  title: Paper Trading Portfolio Service API
+  description: API for managing users, portfolios, and crypto holdings.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8081
+    description: Local development server
+
+tags:
+  - name: Users
+    description: User management
+  - name: Portfolios
+    description: Portfolio management
+  - name: Holdings
+    description: Portfolio holdings management
+
+paths:
+
+  # =========================================================
+  # USERS
+  # =========================================================
+
+  /api/v1/users:
+    post:
+      tags:
+        - Users
+      summary: Create a user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid request
+        '409':
+          description: Username already exists
+
+  /api/v1/users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get a user
+      operationId: getUser
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+
+
+  # =========================================================
+  # PORTFOLIOS
+  # =========================================================
+
+  /api/v1/portfolios:
+    post:
+      tags:
+        - Portfolios
+      summary: Create a portfolio
+      operationId: createPortfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePortfolioRequest'
+      responses:
+        '201':
+          description: Portfolio created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioResponse'
+        '400':
+          description: Invalid request
+        '404':
+          description: User not found
+        '409':
+          description: User already has a portfolio
+
+  /api/v1/portfolios/{portfolioId}:
+    get:
+      tags:
+        - Portfolios
+      summary: Get a portfolio
+      operationId: getPortfolio
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+      responses:
+        '200':
+          description: Portfolio found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioResponse'
+        '404':
+          description: Portfolio not found
+
+  /api/v1/users/{userId}/portfolio:
+    get:
+      tags:
+        - Portfolios
+      summary: Get user's portfolio
+      operationId: getUserPortfolio
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: Portfolio found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortfolioResponse'
+        '404':
+          description: Portfolio not found
+
+
+  # =========================================================
+  # HOLDINGS
+  # =========================================================
+
+  /api/v1/portfolios/{portfolioId}/holdings:
+    post:
+      tags:
+        - Holdings
+      summary: Create a holding
+      operationId: createHolding
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHoldingRequest'
+      responses:
+        '201':
+          description: Holding created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HoldingResponse'
+        '400':
+          description: Invalid request
+        '404':
+          description: Portfolio not found
+        '409':
+          description: Holding for this symbol already exists
+
+    get:
+      tags:
+        - Holdings
+      summary: Get all holdings for a portfolio
+      operationId: getPortfolioHoldings
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+      responses:
+        '200':
+          description: Holdings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HoldingResponse'
+        '404':
+          description: Portfolio not found
+
+  /api/v1/portfolios/{portfolioId}/holdings/{symbol}:
+    get:
+      tags:
+        - Holdings
+      summary: Get a holding by symbol
+      operationId: getHolding
+      parameters:
+        - $ref: '#/components/parameters/PortfolioId'
+        - name: symbol
+          in: path
+          required: true
+          description: Trading symbol
+          schema:
+            type: string
+            example: BTCUSDT
+      responses:
+        '200':
+          description: Holding found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HoldingResponse'
+        '404':
+          description: Holding not found
+
+
+# ===========================================================
+# COMPONENTS
+# ===========================================================
+
+components:
+
+  # ---------------------------------------------------------
+  # PARAMETERS
+  # ---------------------------------------------------------
+
+  parameters:
+
+    UserId:
+      name: userId
+      in: path
+      required: true
+      description: User identifier
+      schema:
+        type: integer
+        format: int64
+        example: 1
+
+    PortfolioId:
+      name: portfolioId
+      in: path
+      required: true
+      description: Portfolio identifier
+      schema:
+        type: integer
+        format: int64
+        example: 1
+
+
+  # ---------------------------------------------------------
+  # SCHEMAS
+  # ---------------------------------------------------------
+
+  schemas:
+
+    CreateUserRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: vinay
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          format: password
+          example: password123
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        username:
+          type: string
+          example: vinay
+        role:
+          type: string
+          example: USER
+        enabled:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-09-06T22:30:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-09-06T22:30:00Z
+
+
+    CreatePortfolioRequest:
+      type: object
+      required:
+        - userId
+        - initialCash
+      properties:
+        userId:
+          type: integer
+          format: int64
+          example: 1
+        initialCash:
+          type: number
+          format: double
+          example: 100000.00
+          minimum: 0
+
+
+    PortfolioResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        userId:
+          type: integer
+          format: int64
+          example: 1
+        cashBalance:
+          type: number
+          format: double
+          example: 100000.00
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-09-06T22:30:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-09-06T22:30:00Z
+
+
+    CreateHoldingRequest:
+      type: object
+      required:
+        - symbol
+        - quantity
+        - averagePrice
+      properties:
+        symbol:
+          type: string
+          maxLength: 20
+          example: BTCUSDT
+        quantity:
+          type: number
+          format: double
+          example: 0.5
+          minimum: 0
+        averagePrice:
+          type: number
+          format: double
+          example: 95000.00
+          minimum: 0
+
+
+    HoldingResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        portfolioId:
+          type: integer
+          format: int64
+          example: 1
+        symbol:
+          type: string
+          example: BTCUSDT
+        quantity:
+          type: number
+          format: double
+          example: 0.5
+        averagePrice:
+          type: number
+          format: double
+          example: 95000.00
+        createdAt:
+          type: string
+          format: date-time
+          example: 2026-09-06T22:30:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2026-09-06T22:30:00Z
