@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class HoldingServiceImpl implements HoldingService {
@@ -62,5 +63,15 @@ public class HoldingServiceImpl implements HoldingService {
     public List<Holding> getHoldingsByPortfolio(Long portfolioId) {
 
         return holdingDao.findByPortfolioId(portfolioId);
+    }
+
+    @Override
+    public Holding getHolding(Long portfolioId, String symbol) {
+        return holdingDao.findByPortfolioIdAndSymbol(portfolioId, symbol)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Holding not found for portfolio: "
+                                        + portfolioId + ", symbol: " + symbol
+                        ));
     }
 }

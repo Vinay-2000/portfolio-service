@@ -4,6 +4,7 @@ import com.papertrading.portfolio.entity.Holding;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface HoldingService {
 
@@ -17,4 +18,7 @@ public interface HoldingService {
     Holding getHolding(Long holdingId);
 
     List<Holding> getHoldingsByPortfolio(Long portfolioId);
+
+    Holding getHolding(Long portfolioId, String symbol);
+
 }

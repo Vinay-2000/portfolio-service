@@ -305,7 +305,6 @@ components:
           example: 1
         initialCash:
           type: number
-          format: double
           example: 100000.00
           minimum: 0
 
@@ -323,7 +322,6 @@ components:
           example: 1
         cashBalance:
           type: number
-          format: double
           example: 100000.00
         createdAt:
           type: string
@@ -348,12 +346,10 @@ components:
           example: BTCUSDT
         quantity:
           type: number
-          format: double
           example: 0.5
           minimum: 0
         averagePrice:
           type: number
-          format: double
           example: 95000.00
           minimum: 0
 

@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
                 )
         }
 )
+@Entity
 public class Holding {
 
     @Id
