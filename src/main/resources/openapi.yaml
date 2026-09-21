@@ -370,11 +370,9 @@ components:
           example: BTCUSDT
         quantity:
           type: number
-          format: double
           example: 0.5
         averagePrice:
           type: number
-          format: double
           example: 95000.00
         createdAt:
           type: string
